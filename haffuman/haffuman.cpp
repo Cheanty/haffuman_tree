@@ -27,21 +27,21 @@ public:
 typedef tree *trew;
 typedef List *link;
 typedef shared_ptr<List> lists;
-void init_haffuman_list(lists head, vector<string> key, vector<int> weight);//生成初始化赫夫曼森林
-void display(lists head);
-lists get_min(lists head);
-void skip(lists &head, lists target);
-void newtree(lists &head, lists &rubbsh);
-trew creat_haffuman(lists &head, lists &rubbsh);//创造赫夫曼树
-void traversalTree(trew root, unordered_map<string, string> &haffuman);//遍历赫夫曼树并生成编码
-void init_map(unordered_map<string, string> &haffuman);
-fstream generate_code(string target, unordered_map<string, string> haffuman_code);//将赫夫曼编码存入文件
-fstream decipher_code(unordered_map<string, string> haffuman_code, string &result);//解码，并存入文件
-void Print();//数据的赫夫曼编码的打印
-void Tree_print();//树的形象化打印
-void init_Tree_print(trew root);//树的形象化并存入文件
-void get_high(trew root, int current_high, int &high);//得到赫夫曼树的高
-int pow(int a, int b);
+void init_haffuman_list(lists head, vector<string> key, vector<int> weight);        //生成初始化赫夫曼森林
+void display(lists head);                                                           //打印森林
+lists get_min(lists head);                                                          //如其名
+void skip(lists &head, lists target);                                               //删除元素
+void newtree(lists &head, lists &rubbsh);                                           //更新森林
+trew creat_haffuman(lists &head, lists &rubbsh);                                    //创造赫夫曼树
+void traversalTree(trew root, unordered_map<string, string> &haffuman);             //遍历赫夫曼树并生成编码
+void init_map(unordered_map<string, string> &haffuman);                             //如其名
+fstream generate_code(string target, unordered_map<string, string> haffuman_code);  //将赫夫曼编码存入文件
+fstream decipher_code(unordered_map<string, string> haffuman_code, string &result); //解码，并存入文件
+void Print();                                                                       //数据的赫夫曼编码的打印
+void Tree_print();                                                                  //树的形象化打印
+void init_Tree_print(trew root);                                                    //树的形象化并存入文件
+void get_high(trew root, int current_high, int &high);                              //得到赫夫曼树的高
+int pow(int a, int b);                                                              //如其名
 
 int main()
 {
@@ -50,12 +50,12 @@ int main()
     fstream hfm("hfmTree");
     if (!hfm)
         exit(-1);
-    lists head = make_shared<List>(); //森林的头结点，后面的节点可以去除，所以用跟指针
+    lists head = make_shared<List>(); //森林的头结点，后面的节点可以去除，所以用智能指针
     head->next = nullptr;
     lists rubbush = make_shared<List>();
     unordered_map<string, string> haffuman_code;
     trew root = nullptr; //树的根节点
-    string judge;//作为一系列输入的判断标志
+    string judge;        //作为一系列输入的判断标志
     cout << "是否重新构造Haffuman树:yes or no";
     cin >> judge;
     if (judge == "yes")
@@ -66,7 +66,7 @@ int main()
         cin >> n;
         vector<string> key(n, "0");
         vector<int> weight(n, 0);
-        for (int i = 0; i < n; i++)//输入一系列参数
+        for (int i = 0; i < n; i++) //输入一系列参数
         {
             getchar();
             cout << "输出每个节点的key:";
@@ -77,7 +77,7 @@ int main()
         // creat haffuman tree
         init_haffuman_list(head, key, weight);
         root = creat_haffuman(head, rubbush);
-        display(head);//打印一系列数据
+        display(head); //打印一系列数据
         traversalTree(root, haffuman_code);
         for (const auto &w : haffuman_code)
         {
@@ -333,6 +333,7 @@ void init_Tree_print(trew root)
     ques.push(root);
     int row = 0, column = 0;
     trew current = root;
+    int lows = 0;
     while (row < high)
     {
         current = ques.front();
@@ -367,31 +368,49 @@ void init_Tree_print(trew root)
     }
     for (int i = 0; i < high; i++)
     {
+        treeprin << " ";
         for (int k = 0; k < matrix[i].size(); k++)
         {
-            for (int j = 0; j < pow(2, high - i - 1); j++)
+            for (int j = 0; j < pow(2, high - i - 2); j++)
                 treeprin << " ";
+            if(matrix[i][k]!=" "){
+                for (int j = 0; j < pow(2, high - i - 2) - 1; j++)
+                    treeprin << "_";
+            }
+            else{
+                for (int j = 0; j < pow(2, high - i - 2) - 1; j++)
+                    treeprin << " ";
+            }
             treeprin << matrix[i][k];
-            for (int j = 0; j < pow(2, high - i - 1) - 1; j++)
+            if(matrix[i][k]!=" "){
+                for (int j = 0; j < pow(2, high - i - 2) - 1; j++)
+                    treeprin << "_";
+            }
+            else{
+                for (int j = 0; j < pow(2, high - i - 2) - 1; j++)
+                    treeprin << " ";
+            }
+            for (int j = 0; j < pow(2, high - i - 2) + 1; j++)
                 treeprin << " ";
         }
         treeprin << endl;
         for (int k = 0; k < matrix[i].size(); k++)
         {
+            treeprin << " ";
             if (i != high - 1 && matrix[i][k] != " ")
             {
+                for (int j = 0; j < pow(2, high - i - 2) - 1; j++)
+                    treeprin << " ";
+                treeprin << "/";
                 for (int j = 0; j < pow(2, high - i - 1) - 1; j++)
                     treeprin << " ";
-                treeprin << "/ \\";
-                for (int j = 0; j < pow(2, high - i - 1) - 2; j++)
+                treeprin << "\\";
+                for (int j = 0; j < pow(2, high - i - 2) - 1; j++)
                     treeprin << " ";
             }
-            else
+            else if (matrix[i][k] == " ")
             {
-                for (int j = 0; j < pow(2, high - i - 1); j++)
-                    treeprin << " ";
-                treeprin << " ";
-                for (int j = 0; j < pow(2, high - i - 1) - 1; j++)
+                for (int j = 0; j < pow(2, high - i) - 1; j++)
                     treeprin << " ";
             }
         }
@@ -412,7 +431,9 @@ void get_high(trew root, int current_high, int &max_high)
 }
 int pow(int a, int b)
 {
-    if (b <= 0)
+    if (b < 0)
+        return 0;
+    else if (b == 0)
         return 1;
     else
         return a * pow(a, b - 1);
